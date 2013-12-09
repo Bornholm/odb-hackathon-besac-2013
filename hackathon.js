@@ -3,28 +3,45 @@
   var chart = document.getElementById('chart');
   var vPadding = 20;
   var hPadding = 100;
-  var width = $(chart).width();
-  var innerWidth = width - hPadding*2;
-  var height = width * (9/16);
-  var innerHeight = height - vPadding*2;
+  var width;
+  var innerWidth;
+  var height;
+  var innerHeight;
 
   var svg = d3.select(chart).append('svg');
   var mainGroup = svg.append('g');
 
-  svg.attr('width', width)
-    .attr('height', height);
+  function updateSize() {
+
+    width = $(chart).width();
+    innerWidth = width - hPadding*2;
+    height = width * (7/16);
+    innerHeight = height - vPadding*2;
+
+    svg
+      .attr('width', width)
+      .attr('height', height);
+
+  }
+
+  updateSize();
 
   mainGroup.attr('transform', 'translate(' + hPadding + ',' + vPadding + ')');
 
   d3.csv('data/besac.csv', function(err, data) {
 
+    
+
     var fields = Object.keys(data[0]).filter(function(k) {
       return ['année', 'code', 'url', 'nom', 'year.1'].indexOf(k) === -1;
     });
 
+    var selectedField = fields[0];
+
     d3.select('#selector')
       .on('change', function() {
-        render(this.value);
+        selectedField = this.value;
+        render(selectedField);
       })
       .selectAll('option')
       .data(fields)
@@ -37,7 +54,12 @@
         return d;
       });
 
-    render(fields[0])
+    render(selectedField);
+
+    $(window).resize(function() {
+      updateSize();
+      render(selectedField);
+    });
 
     function render(field) {
 
@@ -72,6 +94,9 @@
         .orient('left')
         .scale(yScale)
         .tickSize(1)
+        .tickFormat(function(d) {
+          return d;
+        })
         .tickPadding(1);
 
       var baseLine = d3.svg.line()
@@ -79,7 +104,6 @@
           return xScale(+d.année);
         })
         .y(innerHeight)
-        .interpolate('monotone')
 
       var line = d3.svg.line()
         .x(function(d, i) {
@@ -88,7 +112,6 @@
         .y(function(d) {
           return yScale(+d[field])
         })
-        .interpolate('monotone')
 
       mainGroup
         .append('g')
