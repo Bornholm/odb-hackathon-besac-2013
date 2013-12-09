@@ -1,0 +1,22 @@
+svg path.line {
+  fill: none;
+  stroke: #c00;
+  stroke-width: 1px;
+}
+
+svg .point {
+  fill: red;
+}
+
+svg .tick line {
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+ 
+svg text {
+  font-size: 12px;
+}
+
+.info {
+  text-align: center;
+}
